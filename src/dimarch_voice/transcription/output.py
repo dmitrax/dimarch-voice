@@ -15,6 +15,12 @@ def clean_text(raw: str) -> str:
     return text.strip() + "\n"
 
 
-def write_markdown(text: str, output: Path) -> None:
+def write_markdown(text: str, output: Path, meta: dict | None = None) -> None:
     output.parent.mkdir(parents=True, exist_ok=True)
+    if meta:
+        frontmatter = "---\n"
+        for key, value in meta.items():
+            frontmatter += f"{key}: {value}\n"
+        frontmatter += "---\n\n"
+        text = frontmatter + text
     output.write_text(text, encoding="utf-8")

@@ -1,6 +1,7 @@
 import shutil
 import sys
 import tempfile
+from datetime import date
 from pathlib import Path
 from typing import Annotated, Optional
 
@@ -38,7 +39,13 @@ def _run_job(job: TranscriptionJob) -> None:
         raw = engine.transcribe(wav, job.language, job.model, job.timestamps, job.verbose)
 
     text = clean_text(raw)
-    write_markdown(text, job.output)
+    meta = {
+        "source": job.source.name,
+        "date": date.today().isoformat(),
+        "lang": job.language,
+        "model": job.model,
+    }
+    write_markdown(text, job.output, meta=meta)
     console.print(f"[green]→[/green] {job.output}")
 
 
