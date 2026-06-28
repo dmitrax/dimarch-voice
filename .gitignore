@@ -1,0 +1,28 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Environment
+.env
+.env.*
+
+# Logs and temp
+*.log
+tmp/
+temp/
+.cache/
+
+# Models (large binary files — download separately)
+models/
+*.bin
+*.gguf
+
+# Claude Code — personal context, not for public repos
+CLAUDE.md
+CLAUDE.local.md
