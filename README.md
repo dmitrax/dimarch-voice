@@ -14,6 +14,59 @@ On macOS use [MacWhisper](https://goodsnooze.gumroad.com/l/macwhisper).
 
 ---
 
+## Quick Start
+
+```bash
+# Transcribe a file — result appears next to the source
+scribe video.mp4
+# → video.md
+
+# Save to a specific folder
+scribe video.mp4 --out ~/Documents/
+
+# Process multiple files
+for f in ~/Videos/*.mp4; do scribe "$f" --out ~/Documents/transcripts/; done
+```
+
+That's it. No configuration required for basic use.
+
+---
+
+## Workflows
+
+### One-off transcription
+```bash
+scribe video.mp4
+```
+Output: `video.md` next to the source file.
+
+### Save to a project folder
+Set your transcripts directory once:
+```bash
+# Add to ~/.zshrc
+export DVOICE_SAVE_DIR=~/Documents/transcripts
+```
+Then use `--save` to name the output:
+```bash
+scribe video.mp4 --save meeting-notes
+# → ~/Documents/transcripts/meeting-notes.md
+```
+
+### Batch processing
+```bash
+for f in ~/Videos/*.mp4; do
+  scribe "$f" --out ~/Documents/transcripts/
+done
+```
+
+### Check quality before saving
+```bash
+scribe video.mp4 --dry-run        # shows planned output path, does nothing
+scribe video.mp4 --model large-v3 # use largest model for best accuracy
+```
+
+---
+
 ## Features
 
 | Version | Feature | Status |
