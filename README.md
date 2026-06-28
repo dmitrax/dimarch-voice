@@ -165,6 +165,12 @@ Vulkan via RADV is the correct GPU path for this hardware.
 
 ---
 
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for release history.
+
+---
+
 ## License
 
 MIT
