@@ -9,7 +9,6 @@ Format: [Semantic Versioning](https://semver.org/) — `MAJOR.MINOR.PATCH`
 ### v0.1.0 — Local file transcription
 - `--timestamps` flag — optional timestamped output (.srt, .vtt, .md)
 - Batch mode via shell globs
-- Full test on 23 puzzlebot-voronka videos
 
 ## [0.0.1] — 2026-06-28
 
