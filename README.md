@@ -32,9 +32,8 @@ On macOS use [MacWhisper](https://goodsnooze.gumroad.com/l/macwhisper).
 
 ## Requirements
 
-- Arch Linux
-- Python 3.11+ via [mise](https://mise.jdx.dev/)
-- [pipx](https://pipx.pypa.io/)
+- Arch Linux (primary platform)
+- Python 3.12+
 - ffmpeg
 - whisper.cpp built with Vulkan support (see below)
 - AMD GPU with RADV driver (RX 470/480/580 and newer recommended)
@@ -43,16 +42,22 @@ On macOS use [MacWhisper](https://goodsnooze.gumroad.com/l/macwhisper).
 
 ## Install
 
-### 1. Build whisper.cpp with Vulkan
+### 1. Install system dependencies (Arch Linux)
 
 ```bash
-sudo pacman -S cmake vulkan-headers spirv-headers
+sudo pacman -S python python-pipx ffmpeg cmake vulkan-headers spirv-headers
+pipx ensurepath
+```
+
+### 2. Build whisper.cpp with Vulkan
+
+```bash
 bash scripts/build-whisper-cpp-vulkan.sh
 ```
 
 This clones whisper.cpp into `~/builds/whisper.cpp`, builds with `-DGGML_VULKAN=1`, and installs `whisper-cli` to `~/.local/bin/`.
 
-### 2. Download a model
+### 3. Download a model
 
 ```bash
 mkdir -p ~/.local/share/dimarch-voice/models
@@ -62,15 +67,21 @@ bash ~/builds/whisper.cpp/models/download-ggml-model.sh medium \
 
 Available models: `tiny`, `base`, `small`, `medium` (default), `large-v3`.
 
-### 3. Install dvoice / scribe
+### 4. Install dvoice / scribe
 
 ```bash
-sudo pacman -S python-pipx
-pipx ensurepath
-pipx install -e .
+pipx install dimarch-voice --python /usr/bin/python
 ```
 
-### 4. Verify
+For development (editable install):
+
+```bash
+git clone https://github.com/dmitrax/dimarch-voice
+cd dimarch-voice
+pipx install -e . --python /usr/bin/python
+```
+
+### 5. Verify
 
 ```bash
 bash scripts/check-system.sh
@@ -88,7 +99,7 @@ scribe video.mp4
 # Save to custom directory
 scribe video.mp4 --out ~/Desktop
 
-# Save to a project's transcripts dir (puzzlebot-voronka integration)
+# Save to configured save_dir as NAME.md
 scribe video.mp4 --save my-notes
 
 # Choose model and language
@@ -105,6 +116,19 @@ dvoice transcribe video.mp4
 
 # System check
 dvoice doctor
+```
+
+### Configure --save
+
+`--save NAME` saves `NAME.md` to a directory you configure:
+
+```bash
+# via environment variable
+export DVOICE_SAVE_DIR=~/Documents/transcripts
+
+# or in ~/.config/dimarch-voice/config.toml
+[paths]
+save_dir = "~/Documents/transcripts"
 ```
 
 ### Output format
