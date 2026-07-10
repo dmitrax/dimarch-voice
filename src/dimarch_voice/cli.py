@@ -38,7 +38,7 @@ def _run_job(job: TranscriptionJob) -> None:
             console.print(f"[dim]Transcribing with model {job.model}...[/dim]")
         raw = engine.transcribe(wav, job.language, job.model, job.timestamps, job.verbose)
 
-    text = clean_text(raw)
+    text = clean_text(raw, timestamps=job.timestamps)
     meta = {
         "source": job.source.name,
         "date": date.today().isoformat(),

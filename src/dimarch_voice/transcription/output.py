@@ -2,11 +2,12 @@ import re
 from pathlib import Path
 
 
-def clean_text(raw: str) -> str:
+def clean_text(raw: str, timestamps: bool = False) -> str:
     lines = raw.splitlines()
     cleaned = []
     for line in lines:
-        line = re.sub(r"\[\d{2}:\d{2}:\d{2}\.\d{3} --> \d{2}:\d{2}:\d{2}\.\d{3}\]", "", line)
+        if not timestamps:
+            line = re.sub(r"\[\d{2}:\d{2}:\d{2}\.\d{3} --> \d{2}:\d{2}:\d{2}\.\d{3}\]", "", line)
         line = line.strip()
         if line:
             cleaned.append(line)

@@ -61,6 +61,12 @@ class WhisperCppEngine(BaseEngine):
                     f"whisper-cli failed (exit {result.returncode}):\n{result.stderr}"
                 )
 
+            if timestamps:
+                # whisper-cli's -otxt file never contains timestamps regardless
+                # of -nt; the bracketed [start --> end] markers only appear on
+                # stdout when -nt is omitted.
+                return result.stdout
+
             out_file = out_base.with_suffix(".txt")
             if not out_file.exists():
                 raise TranscriptionError("whisper-cli produced no output file")
