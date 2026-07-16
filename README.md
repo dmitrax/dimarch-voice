@@ -73,9 +73,10 @@ scribe video.mp4 --model large-v3 # use largest model for best accuracy
 
 | Version | Feature | Status |
 |---------|---------|--------|
-| v0.1 | Local files (mp4, mp3, ogg, mkv, ...) | in progress |
-| v0.1 | `--timestamps` — optional timestamped output (.srt, .vtt, .md) | planned |
-| v0.2 | Batch mode (`--batch dir/`) | planned |
+| v0.1 | Local files (mp4, mp3, ogg, mkv, ...) | done |
+| v0.1 | `--timestamps` — optional timestamped output | done |
+| v0.1 | Batch mode — multiple files via shell glob | done |
+| v0.2 | Visual timeline — slide screenshots synced to transcript | planned |
 | v0.3 | YouTube / web (yt-dlp) | planned |
 | v0.4 | Telegram channels & chats (telethon) | planned |
 | v0.5 | Dictation — mic → clipboard / type | planned |
