@@ -24,8 +24,8 @@ scribe video.mp4
 # Save to a specific folder
 scribe video.mp4 --out ~/Documents/
 
-# Process multiple files
-for f in ~/Videos/*.mp4; do scribe "$f" --out ~/Documents/transcripts/; done
+# Process multiple files — shell glob, skips files already transcribed
+scribe ~/Videos/*.mp4 --out ~/Documents/transcripts/
 ```
 
 That's it. No configuration required for basic use.
@@ -54,10 +54,12 @@ scribe video.mp4 --save meeting-notes
 
 ### Batch processing
 ```bash
-for f in ~/Videos/*.mp4; do
-  scribe "$f" --out ~/Documents/transcripts/
-done
+scribe ~/Videos/*.mp4 --out ~/Documents/transcripts/
 ```
+Files that already have a matching `.md` output are skipped; pass `--force`
+to re-transcribe them. One failing file doesn't stop the rest — a summary
+line at the end reports how many were transcribed, skipped, and failed.
+`--save` only works with a single file (one name can't apply to many outputs).
 
 ### Check quality before saving
 ```bash
@@ -163,6 +165,9 @@ scribe video.mp4 --force
 
 # Verbose mode (show progress)
 scribe video.mp4 --verbose
+
+# Batch mode — multiple files, skips existing outputs unless --force
+scribe ~/Videos/*.mp4 --out ~/Documents/transcripts/
 
 # Full command equivalent
 dvoice transcribe video.mp4
