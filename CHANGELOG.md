@@ -6,9 +6,18 @@ Format: [Semantic Versioning](https://semver.org/) — `MAJOR.MINOR.PATCH`
 
 ## [Unreleased]
 
-### v0.1.0 — Local file transcription
-- `--timestamps` flag — optional timestamped output (.srt, .vtt, .md)
-- Batch mode via shell globs
+## [0.1.0] — 2026-07-16
+
+### Added
+- Batch mode: `scribe`/`dvoice transcribe` accept multiple source paths
+  (shell globs work naturally); skip-existing-unless-`--force`, per-file
+  error isolation, and an end-of-run summary
+
+### Fixed
+- `--timestamps` was silently producing clean text with no timecodes.
+  whisper-cli's `.txt` output never contains timestamps regardless of
+  `-nt` — they only appear on stdout. Now reads stdout when
+  `--timestamps` is set.
 
 ## [0.0.1] — 2026-06-28
 
