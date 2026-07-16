@@ -190,6 +190,8 @@ export SCRIBE_SAVE_DIR=~/Documents/transcripts
 save_dir = "~/Documents/transcripts"
 ```
 
+The environment variable takes priority if both are set.
+
 ### Output format
 
 Clean UTF-8 Markdown, no timestamps:

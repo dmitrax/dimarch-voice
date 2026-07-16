@@ -6,6 +6,11 @@ Format: [Semantic Versioning](https://semver.org/) — `MAJOR.MINOR.PATCH`
 
 ## [Unreleased]
 
+### Added
+- `--save` directory now also configurable via `[paths] save_dir` in
+  `~/.config/dimarch-scribe/config.toml`, not just `SCRIBE_SAVE_DIR` env var
+  (env var takes priority when both are set)
+
 ### Changed
 - Project renamed: `dimarch-voice` → `dimarch-scribe`. `voice` implied voice
   interactivity (assistant, dialogue, TTS) the project never had or will
