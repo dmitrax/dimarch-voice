@@ -1,12 +1,12 @@
-# dimarch-voice
+# dimarch-scribe
 
-Local voice toolkit for Arch Linux. Transcribes audio and video to clean Markdown. Clean text by default — timestamps optional.
+Local speech-to-text toolkit for Arch Linux. Transcribes audio and video to clean Markdown. Clean text by default — timestamps optional.
 
 ```bash
 scribe lecture.mp4
 scribe interview.ogg --lang ru --save my-notes
 scribe https://youtube.com/watch?v=...   # coming in v0.3
-dvoice dictate                           # coming in v0.5
+dscribe dictate                          # coming in v0.5
 ```
 
 **Platform:** Arch Linux only (Wayland/Hyprland, PipeWire, AMD GPU via Vulkan/RADV).  
@@ -44,7 +44,7 @@ Output: `video.md` next to the source file.
 Set your transcripts directory once:
 ```bash
 # Add to ~/.zshrc
-export DVOICE_SAVE_DIR=~/Documents/transcripts
+export SCRIBE_SAVE_DIR=~/Documents/transcripts
 ```
 Then use `--save` to name the output:
 ```bash
@@ -116,24 +116,24 @@ This clones whisper.cpp into `~/builds/whisper.cpp`, builds with `-DGGML_VULKAN=
 ### 3. Download a model
 
 ```bash
-mkdir -p ~/.local/share/dimarch-voice/models
+mkdir -p ~/.local/share/dimarch-scribe/models
 bash ~/builds/whisper.cpp/models/download-ggml-model.sh medium \
-     ~/.local/share/dimarch-voice/models/
+     ~/.local/share/dimarch-scribe/models/
 ```
 
 Available models: `tiny`, `base`, `small`, `medium` (default), `large-v3`.
 
-### 4. Install dvoice / scribe
+### 4. Install dscribe / scribe
 
 ```bash
-pipx install dimarch-voice --python /usr/bin/python
+pipx install dimarch-scribe --python /usr/bin/python
 ```
 
 For development (editable install):
 
 ```bash
-git clone https://github.com/dmitrax/dimarch-voice
-cd dimarch-voice
+git clone https://github.com/dmitrax/dimarch-scribe
+cd dimarch-scribe
 pipx install -e . --python /usr/bin/python
 ```
 
@@ -171,10 +171,10 @@ scribe video.mp4 --verbose
 scribe ~/Videos/*.mp4 --out ~/Documents/transcripts/
 
 # Full command equivalent
-dvoice transcribe video.mp4
+dscribe transcribe video.mp4
 
 # System check
-dvoice doctor
+dscribe doctor
 ```
 
 ### Configure --save
@@ -183,9 +183,9 @@ dvoice doctor
 
 ```bash
 # via environment variable
-export DVOICE_SAVE_DIR=~/Documents/transcripts
+export SCRIBE_SAVE_DIR=~/Documents/transcripts
 
-# or in ~/.config/dimarch-voice/config.toml
+# or in ~/.config/dimarch-scribe/config.toml
 [paths]
 save_dir = "~/Documents/transcripts"
 ```

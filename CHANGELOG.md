@@ -6,6 +6,15 @@ Format: [Semantic Versioning](https://semver.org/) — `MAJOR.MINOR.PATCH`
 
 ## [Unreleased]
 
+### Changed
+- Project renamed: `dimarch-voice` → `dimarch-scribe`. `voice` implied voice
+  interactivity (assistant, dialogue, TTS) the project never had or will
+  have — it is one-way speech-to-text. `scribe` describes the actual role.
+  CLI: `dvoice` → `dscribe` (`scribe` shortcut unchanged). Env vars:
+  `DVOICE_MODELS_DIR`/`DVOICE_SAVE_DIR` → `SCRIBE_MODELS_DIR`/`SCRIBE_SAVE_DIR`.
+  Default paths: `~/.local/share/dimarch-scribe/models`,
+  `~/.config/dimarch-scribe`.
+
 ## [0.1.0] — 2026-07-16
 
 ### Added

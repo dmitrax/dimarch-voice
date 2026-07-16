@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from .config import SAVE_DIR
-from .errors import DvoiceError, OutputExistsError, SourceNotFoundError
+from .errors import ScribeError, OutputExistsError, SourceNotFoundError
 
 
 def resolve_source(source: str) -> Path:
@@ -19,9 +19,9 @@ def resolve_output(
 ) -> Path:
     if save is not None:
         if SAVE_DIR is None:
-            raise DvoiceError(
+            raise ScribeError(
                 "--save requires a save directory.\n"
-                "Set DVOICE_SAVE_DIR env var or add [paths] save_dir to ~/.config/dimarch-voice/config.toml"
+                "Set SCRIBE_SAVE_DIR env var or add [paths] save_dir to ~/.config/dimarch-scribe/config.toml"
             )
         name = save if save.endswith(".md") else f"{save}.md"
         output = SAVE_DIR / name

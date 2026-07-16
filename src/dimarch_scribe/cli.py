@@ -10,7 +10,7 @@ from rich.console import Console
 
 from . import __version__
 from .config import DEFAULT_LANGUAGE, DEFAULT_MODEL, MODELS_DIR, WHISPER_CLI
-from .errors import DvoiceError, OutputExistsError
+from .errors import ScribeError, OutputExistsError
 from .paths import resolve_output, resolve_source
 from .transcription.audio import extract_audio
 from .transcription.engines.whisper_cpp import WhisperCppEngine
@@ -18,8 +18,8 @@ from .transcription.job import TranscriptionJob
 from .transcription.output import clean_text, write_markdown
 
 app = typer.Typer(
-    name="dvoice",
-    help="Local voice toolkit for Arch Linux.",
+    name="dscribe",
+    help="Local speech-to-text toolkit for Arch Linux.",
     no_args_is_help=True,
 )
 console = Console()
@@ -67,7 +67,7 @@ def _run_transcribe(
     batch = len(sources) > 1
     transcribed = skipped = failed = 0
 
-    def fail(raw_source: str, e: DvoiceError) -> None:
+    def fail(raw_source: str, e: ScribeError) -> None:
         nonlocal failed
         prefix = f"{raw_source}: " if batch else ""
         err.print(f"[red][✗][/red] {prefix}{e}")
@@ -86,7 +86,7 @@ def _run_transcribe(
                 continue
             fail(raw_source, e)
             continue
-        except DvoiceError as e:
+        except ScribeError as e:
             fail(raw_source, e)
             continue
 
@@ -108,7 +108,7 @@ def _run_transcribe(
                 timestamps=timestamps,
             ))
             transcribed += 1
-        except DvoiceError as e:
+        except ScribeError as e:
             fail(raw_source, e)
 
     if batch:
@@ -122,7 +122,7 @@ def _run_transcribe(
 @app.command()
 def transcribe(
     sources: Annotated[list[str], typer.Argument(help="Audio/video file(s) to transcribe — pass multiple paths or a shell glob (e.g. *.mp4) for batch mode")],
-    save: Annotated[Optional[str], typer.Option("--save", help="Save as NAME.md in configured save_dir (DVOICE_SAVE_DIR)")] = None,
+    save: Annotated[Optional[str], typer.Option("--save", help="Save as NAME.md in configured save_dir (SCRIBE_SAVE_DIR)")] = None,
     out: Annotated[Optional[str], typer.Option("--out", help="Output directory")] = None,
     lang: Annotated[str, typer.Option("--lang", help="Language code")] = DEFAULT_LANGUAGE,
     model: Annotated[str, typer.Option("--model", help="Whisper model name")] = DEFAULT_MODEL,
@@ -137,7 +137,7 @@ def transcribe(
 
 @app.command()
 def doctor() -> None:
-    """Check system readiness for dvoice."""
+    """Check system readiness for dscribe."""
     ok = 0
     warn = 0
     fail = 0
@@ -183,7 +183,7 @@ def doctor() -> None:
 
 def version_callback(value: bool) -> None:
     if value:
-        console.print(f"dvoice {__version__}")
+        console.print(f"dscribe {__version__}")
         raise typer.Exit()
 
 

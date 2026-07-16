@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# Check system readiness for dimarch-voice.
-# Run this before using dvoice or building whisper.cpp.
+# Check system readiness for dimarch-scribe.
+# Run this before using dscribe or building whisper.cpp.
 set -euo pipefail
 
-MODELS_DIR="${HOME}/.local/share/dimarch-voice/models"
+MODELS_DIR="${HOME}/.local/share/dimarch-scribe/models"
 DEFAULT_MODEL="ggml-medium.bin"
 
-echo "=== dvoice system check ==="
+echo "=== dscribe system check ==="
 echo ""
 
 OK=0
@@ -76,6 +76,6 @@ echo "Results: ${OK} ok · ${WARN} warnings · ${FAIL} missing"
 
 if [ "$FAIL" -gt 0 ]; then
     echo ""
-    echo "Fix missing items before running dvoice."
+    echo "Fix missing items before running dscribe."
     exit 1
 fi

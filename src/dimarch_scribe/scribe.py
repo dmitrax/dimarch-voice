@@ -11,7 +11,7 @@ app = typer.Typer(name="scribe", help="Transcribe audio/video to clean Markdown.
 @app.command()
 def main(
     sources: Annotated[list[str], typer.Argument(help="Audio/video file(s) to transcribe — pass multiple paths or a shell glob (e.g. *.mp4) for batch mode")],
-    save: Annotated[Optional[str], typer.Option("--save", help="Save as NAME.md in configured save_dir (DVOICE_SAVE_DIR)")] = None,
+    save: Annotated[Optional[str], typer.Option("--save", help="Save as NAME.md in configured save_dir (SCRIBE_SAVE_DIR)")] = None,
     out: Annotated[Optional[str], typer.Option("--out", help="Output directory")] = None,
     lang: Annotated[str, typer.Option("--lang", help="Language code")] = DEFAULT_LANGUAGE,
     model: Annotated[str, typer.Option("--model", help="Whisper model name")] = DEFAULT_MODEL,
