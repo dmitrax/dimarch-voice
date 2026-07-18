@@ -7,6 +7,14 @@ Format: [Semantic Versioning](https://semver.org/) — `MAJOR.MINOR.PATCH`
 ## [Unreleased]
 
 ### Added
+- Test suite (`tests/`, `pytest`, optional `dev` dependency group): unit
+  tests for audio chunking/silence-trim/stereo-detection (synthetic WAVs,
+  no ffmpeg needed), chunk-boundary word dedup, punctuation-restoration
+  verbatim invariants, paragraph-grouping losslessness, plus two
+  integration tests (skipped if whisper-cli/model unavailable) checking
+  trailing-silence hallucination and output determinism. First tests this
+  project has had — previously all verification was manual, on real files,
+  each session.
 - `--save` directory now also configurable via `[paths] save_dir` in
   `~/.config/dimarch-scribe/config.toml`, not just `SCRIBE_SAVE_DIR` env var
   (env var takes priority when both are set)

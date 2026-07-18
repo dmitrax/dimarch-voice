@@ -19,6 +19,9 @@ dependencies = [
     "pyyaml>=6.0",
 ]
 
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
 [project.scripts]
 dscribe = "dimarch_scribe.cli:app"
 scribe = "dimarch_scribe.scribe:app"
