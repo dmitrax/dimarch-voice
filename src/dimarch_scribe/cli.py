@@ -1,6 +1,7 @@
 import shutil
 import sys
 import tempfile
+from contextlib import nullcontext
 from datetime import date
 from pathlib import Path
 from typing import Annotated, Optional
@@ -30,7 +31,8 @@ err = Console(stderr=True)
 def _run_job(job: TranscriptionJob) -> None:
     engine = WhisperCppEngine()
 
-    with tempfile.TemporaryDirectory() as tmp:
+    tmp_ctx = nullcontext(tempfile.mkdtemp(prefix="dscribe-")) if job.keep_temp else tempfile.TemporaryDirectory(prefix="dscribe-")
+    with tmp_ctx as tmp:
         if job.verbose:
             console.print(f"[dim]Extracting audio from {job.source.name}...[/dim]")
         wav = trim_trailing_silence(extract_audio(job.source, tmp), tmp)
@@ -54,6 +56,9 @@ def _run_job(job: TranscriptionJob) -> None:
                 seg.chunk = i
                 segments.append(seg)
 
+        if job.keep_temp:
+            console.print(f"[dim]Kept temp files: {tmp}[/dim]")
+
     text = format_body(segments, timestamps=job.timestamps, show_speakers=job.speakers)
     meta = {
         "source": job.source.name,
@@ -76,6 +81,7 @@ def _run_transcribe(
     timestamps: bool,
     speakers: bool,
     dry_run: bool,
+    keep_temp: bool,
 ) -> None:
     if save is not None and len(sources) > 1:
         err.print("[red][✗][/red] --save can only be used with a single file")
@@ -124,6 +130,7 @@ def _run_transcribe(
                 verbose=verbose,
                 timestamps=timestamps,
                 speakers=speakers,
+                keep_temp=keep_temp,
             ))
             transcribed += 1
         except ScribeError as e:
@@ -149,9 +156,10 @@ def transcribe(
     timestamps: Annotated[bool, typer.Option("--timestamps", help="Include timestamps in output")] = False,
     speakers: Annotated[bool, typer.Option("--speakers", help="Show speaker labels (stereo diarization, best-effort)")] = False,
     dry_run: Annotated[bool, typer.Option("--dry-run", help="Print planned actions without running")] = False,
+    keep_temp: Annotated[bool, typer.Option("--keep-temp", help="Keep intermediate WAV files (extracted/trimmed/chunked audio) instead of deleting them")] = False,
 ) -> None:
     """Transcribe one or more audio/video files to clean Markdown."""
-    _run_transcribe(sources, save, out, lang, model, force, verbose, timestamps, speakers, dry_run)
+    _run_transcribe(sources, save, out, lang, model, force, verbose, timestamps, speakers, dry_run, keep_temp)
 
 
 @app.command()

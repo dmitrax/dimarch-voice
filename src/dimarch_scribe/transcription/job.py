@@ -14,3 +14,4 @@ class TranscriptionJob:
     verbose: bool = False
     timestamps: bool = False
     speakers: bool = False
+    keep_temp: bool = False
