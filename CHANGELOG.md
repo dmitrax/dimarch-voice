@@ -35,10 +35,20 @@ Format: [Semantic Versioning](https://semver.org/) — `MAJOR.MINOR.PATCH`
   on long continuous decodes (measured near-zero punctuation over a 20-min
   run vs. 16-43/100 words for the same content decoded standalone) — a fresh
   subprocess per chunk resets whatever decode context causes the
-  degradation. No overlap/dedup at chunk boundaries yet. Verified end-to-end
-  on a real 59-minute Zoom recording: punctuation density went from 0.5/100
-  words (single continuous decode) to 21.5/100 words (chunked) — same range
-  as isolated short-clip decodes.
+  degradation. Verified end-to-end on a real 59-minute Zoom recording:
+  punctuation density went from 0.5/100 words (single continuous decode) to
+  21.5/100 words (chunked) — same range as isolated short-clip decodes.
+  Word-level dedup at chunk boundaries (`segments.dedupe_chunk_boundary()`):
+  whisper.cpp sometimes transcribes a content word twice when it's spoken
+  exactly at a hard chunk cut — once trailing off at the end of one chunk's
+  decode, again at the start of the next (confirmed on real data, e.g.
+  "...если нет готовности..." / "готовности. Да, сейчас..."). Found during
+  acceptance testing (2 confirmed duplicates across 47 chunk boundaries on
+  two real files). Fix drops the repeated word from the start of the new
+  chunk's segment, but only for non-filler words — common discourse markers
+  ("вот", "ну", "да", ...) are left alone, since those legitimately repeat
+  in spontaneous speech regardless of chunking, and silently deleting a
+  genuinely-spoken word would violate this project's verbatim guarantee.
 - Trailing-silence trim: dead air at the end of the audio is now cut before
   transcription. Chunking exposed a whisper.cpp quirk where a decode ending
   on near-silence gets hallucinated "subtitle credits" text appended

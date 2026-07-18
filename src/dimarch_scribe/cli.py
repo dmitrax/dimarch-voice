@@ -17,7 +17,7 @@ from .transcription.audio import chunk_audio, extract_audio, has_stereo_separati
 from .transcription.engines.whisper_cpp import WhisperCppEngine
 from .transcription.job import TranscriptionJob
 from .transcription.output import format_body, write_markdown
-from .transcription.segments import parse_segments
+from .transcription.segments import dedupe_chunk_boundary, parse_segments
 
 app = typer.Typer(
     name="dscribe",
@@ -50,11 +50,14 @@ def _run_job(job: TranscriptionJob) -> None:
             if job.verbose and len(chunks) > 1:
                 console.print(f"[dim]  chunk {i + 1}/{len(chunks)}[/dim]")
             raw = engine.transcribe(chunk_path, job.language, job.model, job.timestamps, job.verbose, diarize)
-            for seg in parse_segments(raw):
+            chunk_segments = parse_segments(raw)
+            for seg in chunk_segments:
                 seg.start += offset
                 seg.end += offset
                 seg.chunk = i
-                segments.append(seg)
+            if segments and chunk_segments:
+                dedupe_chunk_boundary(segments[-1].text, chunk_segments[0])
+            segments.extend(chunk_segments)
 
         if job.keep_temp:
             console.print(f"[dim]Kept temp files: {tmp}[/dim]")
