@@ -103,12 +103,19 @@ def _group_into_paragraphs(text: str) -> list[str]:
     length-constrained segmentation (Viterbi search over a length prior).
 
     Replaces `do_paragraph_segmentation`/`paragraph_threshold` (used until
-    2026-07-18): measured on two real transcripts (59-min multi-speaker
-    webinar, 3-hour monologue), wtpsplit's newline-probability head is
-    saturated near 1.0 at ~94-98% of sentence-final positions regardless of
-    threshold (0.5 through 0.999 all gave near-identical paragraph counts) —
-    no threshold in [0, 1] distinguishes a paragraph break from a plain
-    sentence break on this domain, so it produced ~1 paragraph per sentence.
+    2026-07-18). Confirmed in wtpsplit 2.2.1 source (`SaT._predict_proba`):
+    without a `style`/`lang_code` mixture (never passed anywhere in this
+    codebase), `clf` is `None` and the library falls back to
+    `sentence_probs = newline_probs = newline_probability_fn(logits)` — the
+    literal same array, not two correlated signals. `paragraph_threshold`
+    was therefore just a stricter threshold on plain sentence-boundary
+    probability, which is why raising it (tested 0.5 through 0.999 on real
+    data) never reduced the paragraph count much: it produced ~1 paragraph
+    per sentence by construction, not because of any domain mismatch.
+    External audit (2026-07-18, see
+    raw/gpt-audit-request-v0.2-paragraph-grouping-2026-07-18.md and its
+    response) caught this; verified directly against the installed source
+    before accepting it.
     Length-constrained segmentation guarantees "".join(pieces) == text — no
     risk of silently dropping or duplicating words — same mechanism already
     used in this project to split over-long paragraphs, now the only

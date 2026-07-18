@@ -18,10 +18,13 @@ Format: [Semantic Versioning](https://semver.org/) — `MAJOR.MINOR.PATCH`
   silence-pause timer was tried first and rejected (real conversational
   audio rarely has pauses long enough to trigger it), and wtpsplit's own
   `do_paragraph_segmentation`/`paragraph_threshold` was tried next and also
-  rejected: measured directly, its paragraph-break probability is saturated
-  near 1.0 at ~95% of sentence-final positions on real Russian ASR
-  transcripts regardless of threshold, producing ~1 paragraph per sentence.
-  New required dependency: `wtpsplit[onnx-cpu]`.
+  rejected: without a `style`/`lang_code` mixture (never used in this
+  codebase), wtpsplit's source falls back to `sentence_probs = newline_probs`
+  — literally the same array — so the "paragraph" threshold was just a
+  stricter cutoff on plain sentence-boundary probability, producing ~1
+  paragraph per sentence on real data regardless of threshold (caught by
+  external audit, verified against the installed source). New required
+  dependency: `wtpsplit[onnx-cpu]`.
 - `--speakers`: best-effort speaker labels via whisper-cli's stereo
   diarization (`-di`, always enabled — free, same transcription pass). A
   confirmed speaker change is also used silently (without `--speakers`) as
