@@ -12,10 +12,11 @@ from . import __version__
 from .config import DEFAULT_LANGUAGE, DEFAULT_MODEL, MODELS_DIR, WHISPER_CLI
 from .errors import ScribeError, OutputExistsError
 from .paths import resolve_output, resolve_source
-from .transcription.audio import extract_audio
+from .transcription.audio import chunk_audio, extract_audio, has_stereo_separation, trim_trailing_silence
 from .transcription.engines.whisper_cpp import WhisperCppEngine
 from .transcription.job import TranscriptionJob
-from .transcription.output import clean_text, write_markdown
+from .transcription.output import format_body, write_markdown
+from .transcription.segments import parse_segments
 
 app = typer.Typer(
     name="dscribe",
@@ -32,13 +33,28 @@ def _run_job(job: TranscriptionJob) -> None:
     with tempfile.TemporaryDirectory() as tmp:
         if job.verbose:
             console.print(f"[dim]Extracting audio from {job.source.name}...[/dim]")
-        wav = extract_audio(job.source, tmp)
+        wav = trim_trailing_silence(extract_audio(job.source, tmp), tmp)
+        diarize = has_stereo_separation(wav)
+        if job.verbose and not diarize:
+            console.print("[dim]No real stereo separation detected — skipping diarization[/dim]")
 
+        chunks = chunk_audio(wav, tmp)
         if job.verbose:
-            console.print(f"[dim]Transcribing with model {job.model}...[/dim]")
-        raw = engine.transcribe(wav, job.language, job.model, job.timestamps, job.verbose)
+            note = f" ({len(chunks)} chunks)" if len(chunks) > 1 else ""
+            console.print(f"[dim]Transcribing with model {job.model}{note}...[/dim]")
 
-    text = clean_text(raw, timestamps=job.timestamps)
+        segments = []
+        for i, (chunk_path, offset) in enumerate(chunks):
+            if job.verbose and len(chunks) > 1:
+                console.print(f"[dim]  chunk {i + 1}/{len(chunks)}[/dim]")
+            raw = engine.transcribe(chunk_path, job.language, job.model, job.timestamps, job.verbose, diarize)
+            for seg in parse_segments(raw):
+                seg.start += offset
+                seg.end += offset
+                seg.chunk = i
+                segments.append(seg)
+
+    text = format_body(segments, timestamps=job.timestamps, show_speakers=job.speakers)
     meta = {
         "source": job.source.name,
         "date": date.today().isoformat(),
@@ -58,6 +74,7 @@ def _run_transcribe(
     force: bool,
     verbose: bool,
     timestamps: bool,
+    speakers: bool,
     dry_run: bool,
 ) -> None:
     if save is not None and len(sources) > 1:
@@ -106,6 +123,7 @@ def _run_transcribe(
                 force=force,
                 verbose=verbose,
                 timestamps=timestamps,
+                speakers=speakers,
             ))
             transcribed += 1
         except ScribeError as e:
@@ -129,10 +147,11 @@ def transcribe(
     force: Annotated[bool, typer.Option("--force", help="Overwrite existing output")] = False,
     verbose: Annotated[bool, typer.Option("--verbose", help="Show progress")] = False,
     timestamps: Annotated[bool, typer.Option("--timestamps", help="Include timestamps in output")] = False,
+    speakers: Annotated[bool, typer.Option("--speakers", help="Show speaker labels (stereo diarization, best-effort)")] = False,
     dry_run: Annotated[bool, typer.Option("--dry-run", help="Print planned actions without running")] = False,
 ) -> None:
     """Transcribe one or more audio/video files to clean Markdown."""
-    _run_transcribe(sources, save, out, lang, model, force, verbose, timestamps, dry_run)
+    _run_transcribe(sources, save, out, lang, model, force, verbose, timestamps, speakers, dry_run)
 
 
 @app.command()

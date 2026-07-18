@@ -18,6 +18,7 @@ def main(
     force: Annotated[bool, typer.Option("--force", help="Overwrite existing output")] = False,
     verbose: Annotated[bool, typer.Option("--verbose", help="Show progress")] = False,
     timestamps: Annotated[bool, typer.Option("--timestamps", help="Include timestamps in output")] = False,
+    speakers: Annotated[bool, typer.Option("--speakers", help="Show speaker labels (stereo diarization, best-effort)")] = False,
     dry_run: Annotated[bool, typer.Option("--dry-run", help="Print planned actions without running")] = False,
 ) -> None:
-    _run_transcribe(sources, save, out, lang, model, force, verbose, timestamps, dry_run)
+    _run_transcribe(sources, save, out, lang, model, force, verbose, timestamps, speakers, dry_run)

@@ -13,3 +13,4 @@ class TranscriptionJob:
     force: bool = False
     verbose: bool = False
     timestamps: bool = False
+    speakers: bool = False

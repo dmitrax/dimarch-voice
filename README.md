@@ -76,12 +76,14 @@ scribe video.mp4 --model large-v3 # use largest model for best accuracy
 | v0.1 | Local files (mp4, mp3, ogg, mkv, ...) | done |
 | v0.1 | `--timestamps` — optional timestamped output | done |
 | v0.1 | Batch mode — multiple files via shell glob | done |
-| v0.2 | Visual timeline — slide screenshots synced to transcript | planned |
-| v0.3 | YouTube / web (yt-dlp) | planned |
-| v0.4 | Telegram channels & chats (telethon) | planned |
-| v0.5 | Dictation — mic → clipboard / type | planned |
-| v0.6 | Meeting mode — mic + system audio | planned |
-| v0.7 | Ollama cleanup & summarise | planned |
+| v0.2 | Readable formatting — paragraphs by topic (wtpsplit), not one text block | done |
+| v0.2 | `--speakers` — best-effort speaker labels (stereo diarization) | done |
+| v0.3 | Visual timeline — slide screenshots synced to transcript | planned |
+| v0.4 | YouTube / web (yt-dlp) | planned |
+| v0.5 | Telegram channels & chats (telethon) | planned |
+| v0.6 | Dictation — mic → clipboard / type | planned |
+| v0.7 | Meeting mode — mic + system audio | planned |
+| v0.8 | Idea digest — local LLM summary (llama.cpp Vulkan) | planned |
 | v1.0 | GTK4 GUI | planned |
 
 ---
@@ -167,6 +169,9 @@ scribe video.mp4 --force
 # Verbose mode (show progress)
 scribe video.mp4 --verbose
 
+# Show best-effort speaker labels (stereo diarization)
+scribe meeting.mp4 --speakers
+
 # Batch mode — multiple files, skips existing outputs unless --force
 scribe ~/Videos/*.mp4 --out ~/Documents/transcripts/
 
@@ -194,11 +199,25 @@ The environment variable takes priority if both are set.
 
 ### Output format
 
-Clean UTF-8 Markdown, no timestamps:
+Clean UTF-8 Markdown, no timestamps, broken into paragraphs by topic (local
+model, [wtpsplit](https://github.com/segment-any-text/wtpsplit) — not a fixed
+pause timer, which doesn't work for continuous speech like a busy call):
 
 ```
 Привет, меня зовут Дима и я хочу рассказать вам о системе которая
 изменила мой подход к рекрутингу...
+
+Сегодня я покажу три конкретных шага, с которых можно начать уже сегодня...
+```
+
+With `--speakers`, paragraphs also break on a detected speaker change and get
+a label — best-effort, based on whisper.cpp's stereo channel diarization
+(`-di`), not real speaker-ID:
+
+```
+**Speaker 1:** Привет, меня зовут Дима...
+
+**Speaker 2:** Круто, давай подробнее...
 ```
 
 ---
