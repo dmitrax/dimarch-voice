@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "dimarch-scribe"
-version = "0.1.0"
+version = "0.2.0"
 description = "Local speech-to-text toolkit for Arch Linux: transcription, dictation, meeting capture"
 readme = "README.md"
 license = { text = "MIT" }
