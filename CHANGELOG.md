@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 Format: [Semantic Versioning](https://semver.org/) — `MAJOR.MINOR.PATCH`
 
-## [Unreleased]
+## [0.2.0] — 2026-07-18
 
 ### Added
 - Test suite (`tests/`, `pytest`, optional `dev` dependency group): unit
