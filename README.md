@@ -76,7 +76,7 @@ scribe video.mp4 --model large-v3 # use largest model for best accuracy
 | v0.1 | Local files (mp4, mp3, ogg, mkv, ...) | done |
 | v0.1 | `--timestamps` — optional timestamped output | done |
 | v0.1 | Batch mode — multiple files via shell glob | done |
-| v0.2 | Readable formatting — paragraphs by topic (wtpsplit), not one text block | done |
+| v0.2 | Readable formatting — sentence/length-based paragraphs (wtpsplit), not one text block | done |
 | v0.2 | `--speakers` — best-effort speaker labels (stereo diarization) | done |
 | v0.3 | Visual timeline — slide screenshots synced to transcript | planned |
 | v0.4 | YouTube / web (yt-dlp) | planned |
@@ -199,9 +199,12 @@ The environment variable takes priority if both are set.
 
 ### Output format
 
-Clean UTF-8 Markdown, no timestamps, broken into paragraphs by topic (local
-model, [wtpsplit](https://github.com/segment-any-text/wtpsplit) — not a fixed
-pause timer, which doesn't work for continuous speech like a busy call):
+Clean UTF-8 Markdown, no timestamps, broken into readable paragraphs by
+sentence boundaries and length (local model,
+[wtpsplit](https://github.com/segment-any-text/wtpsplit) — not a fixed pause
+timer, which doesn't work for continuous speech like a busy call). This
+groups sentences into human-sized blocks; it doesn't detect topic changes —
+recognized words are never altered, dropped, or reordered:
 
 ```
 Привет, меня зовут Дима и я хочу рассказать вам о системе которая
@@ -242,6 +245,18 @@ Developed and tested on AMD RX 580 (Polaris, gfx803) via RADV.
 
 **ROCm is not used** — it does not work reliably on gfx803 with ROCm 6.x.  
 Vulkan via RADV is the correct GPU path for this hardware.
+
+---
+
+## Development
+
+```bash
+pipx inject dimarch-scribe pytest   # or: pip install -e .[dev]
+pytest
+```
+
+Integration tests that need `whisper-cli` + a downloaded model are skipped
+automatically if either is missing.
 
 ---
 

@@ -36,7 +36,8 @@ Format: [Semantic Versioning](https://semver.org/) — `MAJOR.MINOR.PATCH`
 - `--speakers`: best-effort speaker labels via whisper-cli's stereo
   diarization (`-di`, always enabled — free, same transcription pass). A
   confirmed speaker change is also used silently (without `--speakers`) as
-  an extra paragraph-break signal alongside wtpsplit's topic boundaries.
+  an extra paragraph-break signal alongside wtpsplit's sentence/length
+  grouping.
 - Audio chunking: files longer than 5 minutes are now split into fixed-length
   chunks and transcribed as separate whisper-cli invocations, with segment
   timestamps re-offset before stitching. Fixes whisper.cpp losing punctuation
