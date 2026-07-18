@@ -11,13 +11,17 @@ Format: [Semantic Versioning](https://semver.org/) — `MAJOR.MINOR.PATCH`
   `~/.config/dimarch-scribe/config.toml`, not just `SCRIBE_SAVE_DIR` env var
   (env var takes priority when both are set)
 - Readable output formatting: default (non-`--timestamps`) output now breaks
-  into paragraphs by topic instead of one unbroken block of text. Uses
+  into paragraphs instead of one unbroken block of text. Uses
   [wtpsplit](https://github.com/segment-any-text/wtpsplit) (local ONNX model,
-  CPU-only, `paragraph_threshold=0.9`) — a fixed silence-pause timer was
-  tried first and rejected: real conversational audio (e.g. a busy group
-  call) rarely has pauses long enough to trigger it, so it produced one giant
-  paragraph instead of readable text. New required dependency:
-  `wtpsplit[onnx-cpu]`.
+  CPU-only) length-constrained segmentation (`min_length`/`max_length`,
+  Viterbi) to group sentences into human-sized paragraphs — a fixed
+  silence-pause timer was tried first and rejected (real conversational
+  audio rarely has pauses long enough to trigger it), and wtpsplit's own
+  `do_paragraph_segmentation`/`paragraph_threshold` was tried next and also
+  rejected: measured directly, its paragraph-break probability is saturated
+  near 1.0 at ~95% of sentence-final positions on real Russian ASR
+  transcripts regardless of threshold, producing ~1 paragraph per sentence.
+  New required dependency: `wtpsplit[onnx-cpu]`.
 - `--speakers`: best-effort speaker labels via whisper-cli's stereo
   diarization (`-di`, always enabled — free, same transcription pass). A
   confirmed speaker change is also used silently (without `--speakers`) as
@@ -63,6 +67,9 @@ Format: [Semantic Versioning](https://semver.org/) — `MAJOR.MINOR.PATCH`
   monologue): zero corrupted words, exact original word count preserved,
   punctuation density in the healthy 20-31/100 words range. Full writeup:
   wiki/whisper-long-runs-lose-punctuation-chunking-is-the-fix.
+- `--keep-temp`: keep intermediate WAV files (extracted/trimmed/chunked
+  audio) instead of deleting them after the run, for debugging the audio
+  pipeline.
 
 ### Changed
 - Audio preprocessing now extracts stereo (`-ac 2`) instead of mono — needed

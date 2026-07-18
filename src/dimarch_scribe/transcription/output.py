@@ -3,10 +3,11 @@ from pathlib import Path
 from .punctuation import _get_sat, restore_punctuation
 from .segments import Segment
 
-PARAGRAPH_THRESHOLD = 0.9
-# wtpsplit's length constraints are in characters, not words. ~200 words /
-# ~35 words at ~5.8 chars-per-word (measured on real transcript text).
-MAX_PARAGRAPH_CHARS = 1200
+# wtpsplit's length constraints are in characters, not words. Target range
+# picked from real data (see _group_into_paragraphs docstring): median
+# 68-86 words/paragraph, single-sentence paragraphs down to 1-14%, on two
+# real transcripts (59-min multi-speaker webinar, 3-hour monologue).
+MAX_PARAGRAPH_CHARS = 600
 MIN_PARAGRAPH_CHARS = 200
 MIN_SEGMENTS_FOR_SPLIT = 4
 MIN_PARAGRAPH_WORDS = 6
@@ -97,17 +98,21 @@ def _merge_short_paragraphs(paragraphs: list[str]) -> list[str]:
     return merged
 
 
-def _sat_split(text: str, threshold: float) -> list[str]:
-    sat = _get_sat()
-    paragraphs = sat.split(text, do_paragraph_segmentation=True, paragraph_threshold=threshold)
-    return ["".join(p).strip() for p in paragraphs]
+def _group_into_paragraphs(text: str) -> list[str]:
+    """Split a speaker run's text into paragraphs via wtpsplit's native
+    length-constrained segmentation (Viterbi search over a length prior).
 
-
-def _refine_paragraph(text: str) -> list[str]:
-    """Re-split a too-long paragraph with wtpsplit's native length-constrained
-    segmentation (Viterbi search over a length prior) instead of hand-tuned
-    threshold escalation. One call, and it guarantees "".join(pieces) == text
-    — no risk of silently dropping or duplicating words.
+    Replaces `do_paragraph_segmentation`/`paragraph_threshold` (used until
+    2026-07-18): measured on two real transcripts (59-min multi-speaker
+    webinar, 3-hour monologue), wtpsplit's newline-probability head is
+    saturated near 1.0 at ~94-98% of sentence-final positions regardless of
+    threshold (0.5 through 0.999 all gave near-identical paragraph counts) —
+    no threshold in [0, 1] distinguishes a paragraph break from a plain
+    sentence break on this domain, so it produced ~1 paragraph per sentence.
+    Length-constrained segmentation guarantees "".join(pieces) == text — no
+    risk of silently dropping or duplicating words — same mechanism already
+    used in this project to split over-long paragraphs, now the only
+    mechanism.
     """
     if len(text) <= MAX_PARAGRAPH_CHARS:
         return [text]
@@ -127,15 +132,8 @@ def _split_run_into_paragraphs(segments: list[Segment]) -> list[str]:
     if len(segments) < MIN_SEGMENTS_FOR_SPLIT:
         return [_capitalize_first(text)]
 
-    paragraphs = _sat_split(text, PARAGRAPH_THRESHOLD)
-
-    # A single long, uninterrupted turn (one speaker talking for minutes)
-    # can come back as one "coherent" paragraph at the default threshold.
-    refined = []
-    for p in paragraphs:
-        refined.extend(_refine_paragraph(p))
-
-    return [_capitalize_first(p) for p in _merge_short_paragraphs(refined)]
+    paragraphs = _group_into_paragraphs(text)
+    return [_capitalize_first(p) for p in _merge_short_paragraphs(paragraphs)]
 
 
 def format_body(segments: list[Segment], timestamps: bool, show_speakers: bool = False) -> str:
