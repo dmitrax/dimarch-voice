@@ -20,5 +20,6 @@ def main(
     timestamps: Annotated[bool, typer.Option("--timestamps", help="Include timestamps in output")] = False,
     speakers: Annotated[bool, typer.Option("--speakers", help="Show speaker labels (stereo diarization, best-effort)")] = False,
     dry_run: Annotated[bool, typer.Option("--dry-run", help="Print planned actions without running")] = False,
+    keep_temp: Annotated[bool, typer.Option("--keep-temp", help="Keep intermediate WAV files (extracted/trimmed/chunked audio) instead of deleting them")] = False,
 ) -> None:
-    _run_transcribe(sources, save, out, lang, model, force, verbose, timestamps, speakers, dry_run)
+    _run_transcribe(sources, save, out, lang, model, force, verbose, timestamps, speakers, dry_run, keep_temp)
