@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 
 Format: [Semantic Versioning](https://semver.org/) — `MAJOR.MINOR.PATCH`
 
+## [Unreleased]
+
+### Added
+- `mypy` added to the `dev` dependency group, configured against `src/`
+  (`pyproject.toml` `[tool.mypy]`) — catches signature drift between
+  `dscribe` (`cli.py`) and `scribe` (`scribe.py`), the two separate Typer
+  apps that each forward their own arguments to `_run_transcribe()`.
+- `tests/test_cli.py` — exercises both `dscribe transcribe` and `scribe`
+  entry points for real via `--dry-run` (no whisper-cli/model needed), so
+  drift between them fails a test even without running mypy.
+
+### Fixed
+- `scribe` (the `scribe.py` shortcut CLI) crashed with `TypeError` on every
+  invocation: `--keep-temp` was added to `_run_transcribe()`'s required
+  arguments but `scribe.py`'s call site wasn't updated. `dscribe transcribe`
+  was unaffected. Also fixed a missing type annotation in `cli.py` (`segments`)
+  found by the new mypy pass.
+
 ## [0.2.0] — 2026-07-18
 
 ### Added

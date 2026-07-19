@@ -20,7 +20,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8"]
+dev = ["pytest>=8", "mypy>=1.13", "types-PyYAML"]
 
 [project.scripts]
 dscribe = "dimarch_scribe.cli:app"
@@ -31,3 +31,14 @@ Repository = "https://github.com/dmitrax/dimarch-scribe"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.mypy]
+python_version = "3.12"
+files = ["src"]
+warn_unused_ignores = true
+warn_redundant_casts = true
+check_untyped_defs = true
+
+[[tool.mypy.overrides]]
+module = ["wtpsplit.*", "sentencepiece.*", "onnxruntime.*", "faster_whisper.*"]
+ignore_missing_imports = true

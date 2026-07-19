@@ -251,12 +251,19 @@ Vulkan via RADV is the correct GPU path for this hardware.
 ## Development
 
 ```bash
-pipx inject dimarch-scribe pytest   # or: pip install -e .[dev]
+pipx inject dimarch-scribe pytest mypy   # or: pip install -e .[dev]
 pytest
+mypy
 ```
 
 Integration tests that need `whisper-cli` + a downloaded model are skipped
 automatically if either is missing.
+
+`dscribe` and `scribe` are two separate Typer apps that each forward their
+own arguments to `_run_transcribe()` — a parameter added to one and missed
+in the other is a type error `mypy` catches immediately, and `tests/test_cli.py`
+exercises both entry points for real (`--dry-run`, no whisper-cli needed) so
+drift between them fails a test even without running mypy.
 
 ---
 
